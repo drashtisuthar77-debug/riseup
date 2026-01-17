@@ -81,7 +81,7 @@ export const AppSidebar = () => {
   const isExpanded = !sidebarCollapsed || isHovered;
   return <aside className={cn("h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 ease-in-out sticky top-0", isExpanded ? "w-64" : "w-16")} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       {/* Header */}
-      <div className="p-4 border-b border-sidebar-border flex items-center gap-3">
+      <div className="p-4 border-b border-sidebar-border flex items-center gap-3 border-solid">
         <div className="w-8 h-8 rounded-lg bg-sidebar-primary flex items-center justify-center flex-shrink-0">
           <Truck className="w-5 h-5 text-sidebar-primary-foreground" />
         </div>
@@ -118,7 +118,7 @@ export const AppSidebar = () => {
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {filteredNavItems.map(item => {
         const isActive = location.pathname === item.path;
-        return <Link key={item.path} to={item.path} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors border-solid", isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}>
+        return <Link key={item.path} to={item.path} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors border-solid border-primary border-2", isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}>
               <item.icon className="w-5 h-5 flex-shrink-0" />
               {isExpanded && <span className="text-sm font-medium truncate">{item.label}</span>}
             </Link>;
