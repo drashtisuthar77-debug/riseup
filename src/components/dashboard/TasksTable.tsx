@@ -7,49 +7,40 @@ import { Check, AlertTriangle, XCircle, Search, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
-
 interface TasksTableProps {
   tasks: WastePickupTask[];
   showActions?: boolean;
   contractorView?: boolean;
 }
-
-export const TasksTable = ({ tasks, showActions = true, contractorView = false }: TasksTableProps) => {
-  const { updateTaskStatus, userRole } = useApp();
+export const TasksTable = ({
+  tasks,
+  showActions = true,
+  contractorView = false
+}: TasksTableProps) => {
+  const {
+    updateTaskStatus,
+    userRole
+  } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [wardFilter, setWardFilter] = useState<string>('all');
-
   const filteredTasks = tasks.filter(task => {
-    const matchesSearch = 
-      task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.locality.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.contractor.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = task.id.toLowerCase().includes(searchTerm.toLowerCase()) || task.locality.toLowerCase().includes(searchTerm.toLowerCase()) || task.contractor.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || task.status === statusFilter;
     const matchesWard = wardFilter === 'all' || task.ward === wardFilter;
     return matchesSearch && matchesStatus && matchesWard;
   });
-
   const uniqueWards = [...new Set(tasks.map(t => t.ward))];
-
   const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
     updateTaskStatus(taskId, newStatus);
   };
-
   const canEdit = userRole === 'municipality' || userRole === 'contractor';
-
-  return (
-    <div className="bg-card rounded-lg border shadow-sm">
+  return <div className="bg-card rounded-lg border shadow-sm">
       {/* Filters */}
-      <div className="p-4 border-b flex flex-wrap gap-3">
+      <div className="p-4 border-b flex flex-wrap gap-3 border border-solid border-secondary rounded">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search tasks..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9"
-          />
+          <Input placeholder="Search tasks..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="pl-9" />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[150px]">
@@ -70,9 +61,7 @@ export const TasksTable = ({ tasks, showActions = true, contractorView = false }
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Wards</SelectItem>
-            {uniqueWards.map(ward => (
-              <SelectItem key={ward} value={ward}>{ward}</SelectItem>
-            ))}
+            {uniqueWards.map(ward => <SelectItem key={ward} value={ward}>{ward}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -95,8 +84,7 @@ export const TasksTable = ({ tasks, showActions = true, contractorView = false }
             </tr>
           </thead>
           <tbody>
-            {filteredTasks.slice(0, 20).map((task) => (
-              <tr key={task.id} className="hover:bg-muted/50 transition-colors">
+            {filteredTasks.slice(0, 20).map(task => <tr key={task.id} className="hover:bg-muted/50 transition-colors">
                 <td className="font-mono text-sm">{task.id}</td>
                 <td className="text-sm">{format(task.date, 'dd MMM yyyy')}</td>
                 <td>
@@ -115,43 +103,20 @@ export const TasksTable = ({ tasks, showActions = true, contractorView = false }
                 </td>
                 <td className="text-right font-medium">{task.quantityKg.toLocaleString()}</td>
                 <td><StatusBadge status={task.status} size="sm" /></td>
-                {showActions && canEdit && (
-                  <td>
-                    {task.status === 'Pending' && (
-                      <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0 text-success hover:text-success hover:bg-success/10"
-                          onClick={() => handleStatusChange(task.id, 'Completed')}
-                          title="Mark Completed"
-                        >
+                {showActions && canEdit && <td>
+                    {task.status === 'Pending' && <div className="flex gap-1">
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-success hover:text-success hover:bg-success/10" onClick={() => handleStatusChange(task.id, 'Completed')} title="Mark Completed">
                           <Check className="w-4 h-4" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0 text-warning hover:text-warning hover:bg-warning/10"
-                          onClick={() => handleStatusChange(task.id, 'Delayed')}
-                          title="Mark Delayed"
-                        >
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-warning hover:text-warning hover:bg-warning/10" onClick={() => handleStatusChange(task.id, 'Delayed')} title="Mark Delayed">
                           <AlertTriangle className="w-4 h-4" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          onClick={() => handleStatusChange(task.id, 'No-Show')}
-                          title="Mark No-Show"
-                        >
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => handleStatusChange(task.id, 'No-Show')} title="Mark No-Show">
                           <XCircle className="w-4 h-4" />
                         </Button>
-                      </div>
-                    )}
-                  </td>
-                )}
-              </tr>
-            ))}
+                      </div>}
+                  </td>}
+              </tr>)}
           </tbody>
         </table>
       </div>
@@ -160,6 +125,5 @@ export const TasksTable = ({ tasks, showActions = true, contractorView = false }
       <div className="p-4 border-t text-sm text-muted-foreground">
         Showing {Math.min(20, filteredTasks.length)} of {filteredTasks.length} tasks
       </div>
-    </div>
-  );
+    </div>;
 };
