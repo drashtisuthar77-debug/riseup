@@ -10,31 +10,33 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap");
 
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+
 @layer base {
   :root {
-    --background: 214 94.5946% 92.7451%;
-    --foreground: 215 27.907% 16.8627%;
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
 
-    --card: 210 40% 96.0784%;
-    --card-foreground: 229 84% 4.902%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-    --popover: 215 20.2247% 65.098%;
-    --popover-foreground: 210 40% 98.0392%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 215 25% 26.6667%;
+    --primary: 221 83% 25%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.0784%;
+    --secondary: 215 28% 17%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 214 32% 91%;
-    --muted-foreground: 229 84% 4.902%;
+    --muted-foreground: 222 47.3684% 11.1765%;
 
-    --accent: 212 96.3636% 78.4314%;
-    --accent-foreground: 217 16% 39%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
-    --destructive: 21 90.2439% 48.2353%;
-    --destructive-foreground: 240 3.8298% 46.0784%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
 
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
@@ -45,11 +47,11 @@
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
 
-    --border: 215 27.907% 16.8627%;
-    --input: 213 26.8293% 83.9216%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
     --ring: 221 83% 53%;
 
-    --radius: 0.875rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 214 32% 91%;
@@ -62,8 +64,8 @@
 
     --chart-1: 221 83% 53%;
     --chart-2: 142 71% 45%;
-    --chart-3: 48 95.8159% 53.1373%;
-    --chart-4: 53 98.3051% 76.8627%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 0 72% 51%;
     --chart-5: 199 89% 48%;
     --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
     --font-serif: "Source Serif Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
