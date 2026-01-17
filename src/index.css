@@ -4,31 +4,37 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Serif+Pro&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap");
+
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    --background: 214 94.5946% 92.7451%;
+    --foreground: 215 27.907% 16.8627%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 210 40% 96.0784%;
+    --card-foreground: 229 84% 4.902%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 215 20.2247% 65.098%;
+    --popover-foreground: 210 40% 98.0392%;
 
-    --primary: 221 83% 25%;
+    --primary: 215 25% 26.6667%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 215 28% 17%;
+    --secondary: 210 40% 96.0784%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 214 32% 91%;
-    --muted-foreground: 215 16% 47%;
+    --muted-foreground: 229 84% 4.902%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 212 96.3636% 78.4314%;
+    --accent-foreground: 217 16% 39%;
 
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 21 90.2439% 48.2353%;
+    --destructive-foreground: 240 3.8298% 46.0784%;
 
     --success: 142 71% 45%;
     --success-foreground: 0 0% 100%;
@@ -39,11 +45,11 @@
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
+    --border: 215 27.907% 16.8627%;
+    --input: 213 26.8293% 83.9216%;
     --ring: 221 83% 53%;
 
-    --radius: 0.5rem;
+    --radius: 0.875rem;
 
     --sidebar-background: 222 47% 11%;
     --sidebar-foreground: 214 32% 91%;
@@ -56,9 +62,16 @@
 
     --chart-1: 221 83% 53%;
     --chart-2: 142 71% 45%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 0 72% 51%;
+    --chart-3: 48 95.8159% 53.1373%;
+    --chart-4: 53 98.3051% 76.8627%;
     --chart-5: 199 89% 48%;
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Source Serif Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+    --font-mono: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    --shadow-sm: 0px 1px 1.5px 0px hsla(0, 0%, 0%, 0.3);
+    --shadow: 0px 1px 3px 0px hsla(0, 0%, 0%, 0.3);
+    --shadow-md: 0px 1px 4.5px 0px hsla(0, 0%, 0%, 0.3);
+    --shadow-lg: 0px 1px 7.5px 0px hsla(0, 0%, 0%, 0.3);
   }
 
   .dark {
@@ -98,6 +111,14 @@
     --sidebar-accent-foreground: 214 32% 91%;
     --sidebar-border: 215 28% 17%;
     --sidebar-ring: 221 83% 53%;
+    --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-serif: "Source Serif Pro", ui-serif, Georgia, Cambria, Times New Roman, Times, serif;
+    --font-mono: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+    --radius: 0.875rem;
+    --shadow-sm: 0px 1px 1.5px 0px hsla(0, 0%, 0%, 0.3);
+    --shadow: 0px 1px 3px 0px hsla(0, 0%, 0%, 0.3);
+    --shadow-md: 0px 1px 4.5px 0px hsla(0, 0%, 0%, 0.3);
+    --shadow-lg: 0px 1px 7.5px 0px hsla(0, 0%, 0%, 0.3);
   }
 }
 
@@ -116,15 +137,15 @@
   .status-completed {
     @apply bg-success/10 text-success border-success/20;
   }
-  
+
   .status-pending {
     @apply bg-warning/10 text-warning border-warning/20;
   }
-  
+
   .status-delayed {
     @apply bg-destructive/10 text-destructive border-destructive/20;
   }
-  
+
   .status-noshow {
     @apply bg-muted text-muted-foreground border-muted;
   }
@@ -136,11 +157,11 @@
   .data-table {
     @apply w-full text-sm;
   }
-  
+
   .data-table th {
     @apply text-left font-semibold text-muted-foreground uppercase tracking-wider text-xs py-3 px-4 bg-muted/50;
   }
-  
+
   .data-table td {
     @apply py-3 px-4 border-b border-border;
   }
