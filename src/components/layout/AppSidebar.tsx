@@ -118,7 +118,7 @@ export const AppSidebar = () => {
       <nav className="flex-1 p-2 space-y-1 overflow-y-auto">
         {filteredNavItems.map(item => {
         const isActive = location.pathname === item.path;
-        return <Link key={item.path} to={item.path} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors border-solid border-primary border-2", isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}>
+        return <Link key={item.path} to={item.path} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors border-primary border-2 border-dashed opacity-100", isActive ? "bg-sidebar-primary text-sidebar-primary-foreground" : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground")}>
               <item.icon className="w-5 h-5 flex-shrink-0" />
               {isExpanded && <span className="text-sm font-medium truncate">{item.label}</span>}
             </Link>;
