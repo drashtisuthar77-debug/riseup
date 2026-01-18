@@ -1,21 +1,22 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTodaysTasks, useContractors, useTaskStats, useBinStats } from '@/hooks/useData';
+import { useApp } from '@/contexts/AppContext';
 import { KPICard } from '@/components/dashboard/KPICard';
+import { TasksTable } from '@/components/dashboard/TasksTable';
 import { ContractorTable } from '@/components/dashboard/ContractorTable';
+import { StatusBadge } from '@/components/dashboard/StatusBadge';
+import { mockContractors } from '@/lib/mockData';
 import { 
   Truck, 
   CheckCircle2, 
   AlertTriangle, 
   XCircle, 
   Scale, 
+  TrendingUp,
   Calendar,
-  Download,
-  Trash2
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { 
   PieChart, 
   Pie, 
@@ -28,8 +29,10 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend,
+  BarChart,
+  Bar
 } from 'recharts';
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 const COLORS = {
   Completed: 'hsl(var(--success))',
@@ -39,25 +42,25 @@ const COLORS = {
 };
 
 const Dashboard = () => {
-  const { role, profile } = useAuth();
-  const { data: tasks, isLoading: tasksLoading } = useTodaysTasks();
-  const { data: contractors } = useContractors();
-  const { data: taskStats, isLoading: statsLoading } = useTaskStats();
-  const { data: binStats } = useBinStats();
+  const { userRole, tasks } = useApp();
 
+  // Calculate KPIs
+  const todaysTasks = tasks.filter(t => 
+    t.date.toDateString() === new Date().toDateString()
+  );
+  
   const stats = useMemo(() => {
-    if (!tasks) return { total: 0, completed: 0, pending: 0, delayed: 0, noShow: 0, totalWaste: 0 };
+    const total = todaysTasks.length;
+    const completed = todaysTasks.filter(t => t.status === 'Completed').length;
+    const pending = todaysTasks.filter(t => t.status === 'Pending').length;
+    const delayed = todaysTasks.filter(t => t.status === 'Delayed').length;
+    const noShow = todaysTasks.filter(t => t.status === 'No-Show').length;
+    const totalWaste = todaysTasks.reduce((sum, t) => sum + t.quantityKg, 0);
     
-    return {
-      total: tasks.length,
-      completed: tasks.filter(t => t.status === 'Completed').length,
-      pending: tasks.filter(t => t.status === 'Pending').length,
-      delayed: tasks.filter(t => t.status === 'Delayed').length,
-      noShow: tasks.filter(t => t.status === 'No-Show').length,
-      totalWaste: tasks.reduce((sum, t) => sum + (t.quantity_kg || 0), 0),
-    };
-  }, [tasks]);
+    return { total, completed, pending, delayed, noShow, totalWaste };
+  }, [todaysTasks]);
 
+  // Status distribution for pie chart
   const statusData = [
     { name: 'Completed', value: stats.completed, color: COLORS.Completed },
     { name: 'Pending', value: stats.pending, color: COLORS.Pending },
@@ -65,17 +68,48 @@ const Dashboard = () => {
     { name: 'No-Show', value: stats.noShow, color: COLORS['No-Show'] }
   ].filter(d => d.value > 0);
 
+  // Trend data for last 7 days
+  const trendData = useMemo(() => {
+    const last7Days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = subDays(new Date(), i);
+      const dayTasks = tasks.filter(t => 
+        t.date.toDateString() === date.toDateString()
+      );
+      last7Days.push({
+        date: format(date, 'EEE'),
+        Completed: dayTasks.filter(t => t.status === 'Completed').length,
+        Delayed: dayTasks.filter(t => t.status === 'Delayed').length,
+        'No-Show': dayTasks.filter(t => t.status === 'No-Show').length
+      });
+    }
+    return last7Days;
+  }, [tasks]);
+
   const getRoleTitle = () => {
-    switch (role) {
-      case 'officer': return 'Municipality Officer Dashboard';
+    switch (userRole) {
+      case 'municipality': return 'Municipality Officer Dashboard';
       case 'contractor': return 'Contractor Dashboard';
-      case 'verifier': return 'Field Verifier Dashboard';
-      case 'analyst': return 'Ministry Analytics Dashboard';
+      case 'field': return 'Field Verifier Dashboard';
+      case 'ministry': return 'Ministry Analytics Dashboard';
       default: return 'Dashboard';
     }
   };
 
-  const isLoading = tasksLoading || statsLoading;
+  const exportToCSV = () => {
+    const headers = ['Task ID', 'Date', 'Ward', 'Zone', 'Locality', 'Contractor', 'Status', 'Waste Type', 'Quantity (Kg)'];
+    const csvData = todaysTasks.map(t => [
+      t.id, format(t.date, 'yyyy-MM-dd'), t.ward, t.zone, t.locality, t.contractor, t.status, t.wasteType, t.quantityKg
+    ]);
+    
+    const csv = [headers.join(','), ...csvData.map(row => row.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `waste-pickup-report-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    a.click();
+  };
 
   return (
     <MainLayout>
@@ -90,7 +124,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline">
+            <Button variant="outline" onClick={exportToCSV}>
               <Download className="w-4 h-4 mr-2" />
               Export CSV
             </Button>
@@ -98,48 +132,47 @@ const Dashboard = () => {
         </div>
 
         {/* KPI Cards */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {[1,2,3,4,5].map(i => <Skeleton key={i} className="h-28" />)}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <KPICard
-              title="Total Pickups"
-              value={stats.total}
-              icon={<Truck className="w-6 h-6 text-primary" />}
-              variant="default"
-            />
-            <KPICard
-              title="Completed"
-              value={stats.completed}
-              icon={<CheckCircle2 className="w-6 h-6 text-success" />}
-              variant="success"
-            />
-            <KPICard
-              title="Pending"
-              value={stats.pending}
-              icon={<AlertTriangle className="w-6 h-6 text-warning" />}
-              variant="warning"
-            />
-            <KPICard
-              title="Delayed/No-Show"
-              value={stats.delayed + stats.noShow}
-              icon={<XCircle className="w-6 h-6 text-destructive" />}
-              variant="danger"
-            />
-            <KPICard
-              title="Critical Bins"
-              value={binStats?.critical || 0}
-              icon={<Trash2 className="w-6 h-6 text-info" />}
-              variant="info"
-            />
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <KPICard
+            title="Total Pickups"
+            value={stats.total}
+            icon={<Truck className="w-6 h-6 text-primary" />}
+            change={8}
+            variant="default"
+          />
+          <KPICard
+            title="Completed"
+            value={stats.completed}
+            icon={<CheckCircle2 className="w-6 h-6 text-success" />}
+            change={12}
+            variant="success"
+          />
+          <KPICard
+            title="Pending"
+            value={stats.pending}
+            icon={<AlertTriangle className="w-6 h-6 text-warning" />}
+            variant="warning"
+          />
+          <KPICard
+            title="Delayed/No-Show"
+            value={stats.delayed + stats.noShow}
+            icon={<XCircle className="w-6 h-6 text-destructive" />}
+            change={-5}
+            variant="danger"
+          />
+          <KPICard
+            title="Waste Collected"
+            value={`${(stats.totalWaste / 1000).toFixed(1)}T`}
+            icon={<Scale className="w-6 h-6 text-info" />}
+            change={15}
+            variant="info"
+          />
+        </div>
 
-        {/* Charts - Officer and Analyst only */}
-        {(role === 'officer' || role === 'analyst') && (
+        {/* Charts Row */}
+        {(userRole === 'municipality' || userRole === 'ministry') && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Status Distribution Pie Chart */}
             <div className="bg-card rounded-lg border shadow-sm p-6">
               <h3 className="font-semibold mb-4">Today's Status Distribution</h3>
               <div className="h-64">
@@ -165,47 +198,61 @@ const Dashboard = () => {
               </div>
             </div>
 
+            {/* 7-Day Trend Line Chart */}
             <div className="bg-card rounded-lg border shadow-sm p-6 lg:col-span-2">
-              <h3 className="font-semibold mb-4">System Overview</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-2xl font-bold">{binStats?.total || 0}</p>
-                  <p className="text-sm text-muted-foreground">Total Bins</p>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-2xl font-bold">{binStats?.avgFillLevel || 0}%</p>
-                  <p className="text-sm text-muted-foreground">Avg Fill Level</p>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-2xl font-bold">{contractors?.length || 0}</p>
-                  <p className="text-sm text-muted-foreground">Contractors</p>
-                </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <p className="text-2xl font-bold">{taskStats?.total || 0}</p>
-                  <p className="text-sm text-muted-foreground">All Tasks</p>
-                </div>
+              <h3 className="font-semibold mb-4">7-Day Performance Trend</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis dataKey="date" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <Tooltip />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Completed" 
+                      stroke="hsl(var(--success))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--success))' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Delayed" 
+                      stroke="hsl(var(--warning))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--warning))' }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="No-Show" 
+                      stroke="hsl(var(--destructive))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--destructive))' }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
             </div>
           </div>
         )}
 
-        {/* Contractor Table - Officer and Analyst only */}
-        {(role === 'officer' || role === 'analyst') && contractors && (
-          <ContractorTable contractors={contractors.map(c => ({
-            id: c.id,
-            name: c.name,
-            contactPerson: c.contact_person,
-            phone: c.phone,
-            email: c.email,
-            assignedWards: c.assigned_wards,
-            complianceScore: c.compliance_score,
-            totalTasks: c.total_tasks,
-            completedOnTime: c.completed_on_time,
-            delayed: c.delayed,
-            noShow: c.no_show,
-            riskLevel: c.risk_level,
-          }))} />
+        {/* Contractor Performance - Municipality and Ministry Only */}
+        {(userRole === 'municipality' || userRole === 'ministry') && (
+          <ContractorTable contractors={mockContractors} />
         )}
+
+        {/* Tasks Table */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">
+            {userRole === 'contractor' ? 'Your Assigned Tasks' : 'Today\'s Pickup Tasks'}
+          </h2>
+          <TasksTable 
+            tasks={todaysTasks} 
+            showActions={userRole !== 'ministry'} 
+            contractorView={userRole === 'contractor'}
+          />
+        </div>
       </div>
     </MainLayout>
   );

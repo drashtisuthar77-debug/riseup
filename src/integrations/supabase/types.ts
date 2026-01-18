@@ -157,45 +157,6 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
-        Row: {
-          assigned_wards: string[] | null
-          assigned_zone: string | null
-          avatar_url: string | null
-          created_at: string
-          email: string | null
-          full_name: string
-          id: string
-          phone: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          assigned_wards?: string[] | null
-          assigned_zone?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          full_name: string
-          id?: string
-          phone?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          assigned_wards?: string[] | null
-          assigned_zone?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          email?: string | null
-          full_name?: string
-          id?: string
-          phone?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       reports: {
         Row: {
           address: string | null
@@ -312,27 +273,6 @@ export type Database = {
           },
         ]
       }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
       waste_pickup_tasks: {
         Row: {
           completed_time: string | null
@@ -410,21 +350,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: {
-        Args: { _user_id: string }
-        Returns: Database["public"]["Enums"]["app_role"]
-      }
-      get_user_zones: { Args: { _user_id: string }; Returns: string[] }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "officer" | "contractor" | "verifier" | "analyst"
       bin_status: "Active" | "Full" | "Maintenance"
       bin_type: "General" | "Recyclable" | "Organic" | "Hazardous"
       report_severity: "Low" | "Medium" | "High" | "Critical"
@@ -560,7 +488,6 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["officer", "contractor", "verifier", "analyst"],
       bin_status: ["Active", "Full", "Maintenance"],
       bin_type: ["General", "Recyclable", "Organic", "Hazardous"],
       report_severity: ["Low", "Medium", "High", "Critical"],
